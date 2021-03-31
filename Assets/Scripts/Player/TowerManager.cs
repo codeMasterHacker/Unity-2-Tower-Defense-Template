@@ -10,14 +10,15 @@ public class TowerManager : MonoBehaviour
     private int currentHealth = 100;
     private SpriteRenderer spr;
     public GameObject currentTarget;
-    public PlayerBaseScript baseTower;
+    //public PlayerBaseScript baseTower;
+    private bool readyToFire = true;
 
     // Start is called before the first frame update
     void Start()
     {
         //anim = GetComponent<Animator>();
-        baseTower = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBaseScript>();
-        spr = GetComponent<SpriteRenderer>();
+        //baseTower = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBaseScript>();
+        spr = this.gameObject.GetComponent<SpriteRenderer>();
         spr.color = self.color;
         spr.sprite = self.sprite;
         currentHealth = self.health;
@@ -26,23 +27,40 @@ public class TowerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (currentTarget != null)
+        //Debug.Log(currentTarget);
+        //Debug.Log(self);
+
+        if (currentTarget != null && GetTargetDis() <= self.attackRange)
         {
             AttackTarget();
         }
-        else
-        {
-            FindNextTarget();
-        }
+        //else
+        //{
+        //    FindNextTarget();
+        //}
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log("Tower taking damage");
+
         if (collision.gameObject.GetComponent<EnemyManager>() != null)
         {
             // Take damage from enemy collision
             ChangeHealth(-collision.gameObject.GetComponent<EnemyManager>().self.damage);
             collision.gameObject.GetComponent<EnemyManager>().ProjectileHit(self.health);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("Tower taking damage");
+
+        if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        {
+            // Take damage from enemy collision
+            ChangeHealth(-collision.gameObject.GetComponent<ProjectileManager>().self.damage);
+            Destroy(collision.gameObject);
         }
     }
 
@@ -94,13 +112,16 @@ public class TowerManager : MonoBehaviour
 
     public void AttackTarget()
     {
-        GameObject shotProjectile = CreateProjectile();
+        if (readyToFire)
+        {
+            StartCoroutine(FireProjectile());
+        }
     }
 
     private GameObject CreateProjectile()
     {
         GameObject projectile = new GameObject();
-        projectile.transform.parent = this.transform;
+        //projectile.transform.parent = this.transform;
         projectile.transform.position = this.transform.position;
 
         projectile.AddComponent<SpriteRenderer>();
@@ -108,6 +129,18 @@ public class TowerManager : MonoBehaviour
         projectile.GetComponent<SpriteRenderer>().sortingOrder = 100;
         projectile.GetComponent<CircleCollider2D>().isTrigger = true;
 
+        projectile.AddComponent<ProjectileManager>();
+        projectile.GetComponent<ProjectileManager>().self = self.projectile;
+        projectile.GetComponent<ProjectileManager>().target = currentTarget;
+
         return projectile;
+    }
+
+    IEnumerator FireProjectile()
+    {
+        GameObject shotProjectile = CreateProjectile();
+        readyToFire = false;
+        yield return new WaitForSeconds(self.attackCooldown);
+        readyToFire = true;
     }
 }

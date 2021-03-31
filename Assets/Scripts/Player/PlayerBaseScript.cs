@@ -20,7 +20,7 @@ public class PlayerBaseScript : MonoBehaviour
     public TextMeshProUGUI playerResourcesText;
     public GameObject gameOverField;
     public GameObject cursor;
-    public GameObject towerTemplate;
+    //public GameObject towerTemplate;
     public TowerListScript towerListManager;
 
     // Update is called once per frame
@@ -54,11 +54,24 @@ public class PlayerBaseScript : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("Player 1 Base taking damage");
+
+        if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        {
+            health -= collision.gameObject.GetComponent<ProjectileManager>().self.damage;
+            Destroy(collision.gameObject);
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.GetComponent<EnemyManager>() != null)
+        Debug.Log("Player 1 Base taking damage");
+
+        if (collision.gameObject.GetComponent<ProjectileManager>() != null)
         {
-            health -= collision.gameObject.GetComponent<EnemyManager>().self.damage;
+            health -= collision.gameObject.GetComponent<ProjectileManager>().self.damage;
             Destroy(collision.gameObject);
         }
     }
@@ -69,9 +82,31 @@ public class PlayerBaseScript : MonoBehaviour
         {
             resources -= towerListManager.towerList[currentTower].cost;
             // Spawn the units using selection, make sure to add cost
-            GameObject tower = Instantiate(towerTemplate, location, Quaternion.identity);
-            tower.GetComponent<TowerManager>().self = towerListManager.towerList[currentTower];
+            //GameObject tower = Instantiate(towerTemplate, location, Quaternion.identity);
+            GameObject tower = CreateTower(location, towerListManager.towerList[currentTower]);
+            //tower.GetComponent<TowerManager>().self = towerListManager.towerList[currentTower];
         }
+    }
+
+    private GameObject CreateTower(Vector3 location, TowerType towerType)
+    {
+        GameObject tower = new GameObject();
+        //tower.transform.parent = this.transform;
+        tower.transform.position = location;
+
+        tower.AddComponent<Rigidbody2D>();
+
+        tower.AddComponent<PolygonCollider2D>();
+        tower.GetComponent<PolygonCollider2D>().isTrigger = true;
+
+        tower.AddComponent<SpriteRenderer>();
+        tower.GetComponent<SpriteRenderer>().sortingOrder = 30;
+
+        tower.AddComponent<TowerManager>();
+        tower.GetComponent<TowerManager>().self = towerType;
+        tower.GetComponent<TowerManager>().currentTarget = GameObject.FindGameObjectWithTag("Player2");
+
+        return tower;
     }
 
     public void SelectTowerToBuy(int currentSelection)
