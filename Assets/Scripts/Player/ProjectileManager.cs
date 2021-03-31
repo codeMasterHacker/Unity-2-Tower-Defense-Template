@@ -31,15 +31,15 @@ public class ProjectileManager : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Projectile taking damage");
+        //Debug.Log("Projectile taking damage");
 
-        if (collision.GetComponent<EnemyManager>() != null)
-        {
-            collision.GetComponent<EnemyManager>().ProjectileHit(self.damage);
-            Destroy(this.gameObject);
-        }
+        //if (collision.GetComponent<EnemyManager>() != null)
+        //{
+        //    collision.GetComponent<EnemyManager>().ProjectileHit(self.damage);
+        //    Destroy(this.gameObject);
+        //}
 
-        Destroy(this.gameObject);
+        //Destroy(this.gameObject);
     }
 
     IEnumerator ActiveTime()
@@ -47,5 +47,4 @@ public class ProjectileManager : MonoBehaviour
         yield return new WaitForSeconds(maxActiveTime);
         Destroy(this.gameObject);
     }
-
 }

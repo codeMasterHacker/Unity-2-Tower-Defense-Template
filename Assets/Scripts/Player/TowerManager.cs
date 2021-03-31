@@ -10,7 +10,8 @@ public class TowerManager : MonoBehaviour
     private int currentHealth = 100;
     private SpriteRenderer spr;
     public GameObject currentTarget;
-    //public PlayerBaseScript baseTower;
+    public PlayerBaseScript baseTower;
+    public PlayerBase playerBase;
     private bool readyToFire = true;
 
     // Start is called before the first frame update
@@ -54,13 +55,29 @@ public class TowerManager : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Tower taking damage");
+        //Debug.Log("Tower taking damage");
 
-        if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        //if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        //{
+        //    // Take damage from enemy collision
+        //    ChangeHealth(-collision.gameObject.GetComponent<ProjectileManager>().self.damage);
+        //    Destroy(collision.gameObject);
+        //}
+
+        ProjectileManager pm = collision.gameObject.GetComponent<ProjectileManager>();
+
+        if (pm != null)
         {
-            // Take damage from enemy collision
-            ChangeHealth(-collision.gameObject.GetComponent<ProjectileManager>().self.damage);
-            Destroy(collision.gameObject);
+            if (pm.CompareTag("p1") && playerBase != null)
+            {
+                ChangeHealth(-pm.self.damage);
+                Destroy(collision.gameObject);
+            }
+            else if (pm.CompareTag("p2") && baseTower != null)
+            {
+                ChangeHealth(-pm.self.damage);
+                Destroy(collision.gameObject);
+            }
         }
     }
 
@@ -125,13 +142,24 @@ public class TowerManager : MonoBehaviour
         projectile.transform.position = this.transform.position;
 
         projectile.AddComponent<SpriteRenderer>();
-        projectile.AddComponent<CircleCollider2D>();
         projectile.GetComponent<SpriteRenderer>().sortingOrder = 100;
+        projectile.AddComponent<CircleCollider2D>();
         projectile.GetComponent<CircleCollider2D>().isTrigger = true;
 
         projectile.AddComponent<ProjectileManager>();
         projectile.GetComponent<ProjectileManager>().self = self.projectile;
         projectile.GetComponent<ProjectileManager>().target = currentTarget;
+
+        if (baseTower != null)
+        {
+            projectile.tag = "p1";
+        }
+        else if (playerBase != null)
+        {
+            projectile.tag = "p2";
+        }
+        else
+            projectile.tag = "p";
 
         return projectile;
     }

@@ -56,11 +56,20 @@ public class PlayerBaseScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Player 1 Base taking damage");
+        //Debug.Log("Player 1 Base taking damage");
 
-        if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        //if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        //{
+        //    health -= collision.gameObject.GetComponent<ProjectileManager>().self.damage;
+        //    Destroy(collision.gameObject);
+        //}
+
+
+        ProjectileManager pm = collision.gameObject.GetComponent<ProjectileManager>();
+
+        if (pm != null && pm.CompareTag("p2"))
         {
-            health -= collision.gameObject.GetComponent<ProjectileManager>().self.damage;
+            health -= pm.self.damage;
             Destroy(collision.gameObject);
         }
     }
@@ -105,6 +114,7 @@ public class PlayerBaseScript : MonoBehaviour
         tower.AddComponent<TowerManager>();
         tower.GetComponent<TowerManager>().self = towerType;
         tower.GetComponent<TowerManager>().currentTarget = GameObject.FindGameObjectWithTag("Player2");
+        tower.GetComponent<TowerManager>().baseTower = this;
 
         return tower;
     }

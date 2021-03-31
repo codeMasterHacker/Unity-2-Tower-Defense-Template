@@ -58,11 +58,21 @@ public class PlayerBase : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Player 2 Base taking damage");
+        //Debug.Log("Player 2 Base taking damage");
 
-        if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        //if (collision.gameObject.GetComponent<ProjectileManager>() != null)
+        //{
+        //    health -= collision.gameObject.GetComponent<ProjectileManager>().self.damage;
+        //    Destroy(collision.gameObject);
+        //}
+
+
+
+        ProjectileManager pm = collision.gameObject.GetComponent<ProjectileManager>();
+
+        if(pm != null && pm.CompareTag("p1"))
         {
-            health -= collision.gameObject.GetComponent<ProjectileManager>().self.damage;
+            health -= pm.self.damage;
             Destroy(collision.gameObject);
         }
     }
