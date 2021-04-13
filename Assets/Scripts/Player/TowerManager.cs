@@ -13,6 +13,7 @@ public class TowerManager : MonoBehaviour
     public PlayerBaseScript baseTower;
     public PlayerBase playerBase;
     private bool readyToFire = true;
+    public bool beginMatch = false;
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +32,7 @@ public class TowerManager : MonoBehaviour
         //Debug.Log(currentTarget);
         //Debug.Log(self);
 
-        if (currentTarget != null && GetTargetDis() <= self.attackRange)
+        if (currentTarget != null && beginMatch)
         {
             AttackTarget();
         }
